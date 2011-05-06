@@ -12,8 +12,7 @@ namespace Ping
 {
 	public partial class Form1 : Form
 	{
-
-		readonly string URL;
+		string URL;
 
 		bool running = false;
 		bool? laststate = null;
@@ -31,9 +30,7 @@ namespace Ping
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
-			Text = URL;
-			Width = TextRenderer.MeasureText(Text, Font).Width + 150;
-			MaximumSize = Size;
+			textBox1.Text = URL;
 			UpdateIcon(null);
 		}
 
@@ -99,6 +96,17 @@ namespace Ping
 
 			//pictureBox1.BackgroundImage = icon.ToBitmap();
 			Icon = icon;
+		}
+
+		private void textBox1_TextChanged(object sender, EventArgs e)
+		{
+			MaximumSize = new Size(0, 0);
+			MinimumSize = new Size(0, 0);
+			URL = textBox1.Text;
+			Text = URL;
+			Width = TextRenderer.MeasureText(Text, Font).Width + 150;
+			MaximumSize = Size;
+			MinimumSize = Size;
 		}
 	}
 }
