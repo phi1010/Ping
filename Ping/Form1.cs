@@ -12,12 +12,12 @@ namespace Ping
 {
 	public partial class Form1 : Form
 	{
-
+		readonly int Count = 5;
+		readonly int PauseTime = 100;
 		readonly string URL;
 
 		bool running = false;
-		bool? laststate = null;
-		//List<int> states = new List<int>();
+		List<int> states = new List<int>();
 		public Form1()
 		{
 			InitializeComponent();
@@ -34,7 +34,7 @@ namespace Ping
 			Text = URL;
 			Width = TextRenderer.MeasureText(Text, Font).Width + 150;
 			MaximumSize = Size;
-			UpdateIcon(null);
+			UpdateIcon();
 		}
 
 		public bool? CheckInternetConnection()
@@ -59,43 +59,21 @@ namespace Ping
 				running = true;
 				bool? state = CheckInternetConnection();
 
-				UpdateIcon(state);
-				laststate = state;
+				UpdateIcon();
 				running = false;
 			}
 		}
 
-		private void UpdateIcon(bool? state)
+		private void UpdateIcon()
 		{
-			Icon icon;
+			Icon icon = null;
+			Icon icon0 = Properties.Resources._0;// X
+			Icon icon1 = Properties.Resources._1;// !
+			Icon icon2 = Properties.Resources._2;// ?
+			Icon icon3 = Properties.Resources._3;// i
+			Icon icon4 = Properties.Resources._4;// +
 
-			if (laststate == null)
-			{
-				if (state == null)
-					icon = Properties.Resources.x;
-				else if (state == true)
-					icon = Properties.Resources._1;
-				else//false
-					icon = Properties.Resources._0;
-			}
-			else if (laststate == true)
-			{
-				if (state == null)
-					icon = Properties.Resources._1;
-				else if (state == true)
-					icon = Properties.Resources._1;
-				else//false
-					icon = Properties.Resources._10;
-			}
-			else //false
-			{
-				if (state == null)
-					icon = Properties.Resources._0;
-				else if (state == true)
-					icon = Properties.Resources._10;
-				else//false
-					icon = Properties.Resources._0;
-			}
+
 
 			//pictureBox1.BackgroundImage = icon.ToBitmap();
 			Icon = icon;

@@ -67,13 +67,6 @@ namespace Ping.Properties {
             }
         }
         
-        internal static System.Drawing.Icon _01 {
-            get {
-                object obj = ResourceManager.GetObject("_01", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
         internal static System.Drawing.Icon _1 {
             get {
                 object obj = ResourceManager.GetObject("_1", resourceCulture);
@@ -81,16 +74,23 @@ namespace Ping.Properties {
             }
         }
         
-        internal static System.Drawing.Icon _10 {
+        internal static System.Drawing.Icon _2 {
             get {
-                object obj = ResourceManager.GetObject("_10", resourceCulture);
+                object obj = ResourceManager.GetObject("_2", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
         
-        internal static System.Drawing.Icon x {
+        internal static System.Drawing.Icon _3 {
             get {
-                object obj = ResourceManager.GetObject("x", resourceCulture);
+                object obj = ResourceManager.GetObject("_3", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon _4 {
+            get {
+                object obj = ResourceManager.GetObject("_4", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
