@@ -1,0 +1,9 @@
+ICOFX:
+
+-> 256*256, 32Bit
+Effect/Blur/Blur More
+Effect/Blur/Blur More
+Effect/Shake Less
+Effect/Sharpen/Sharpen More
+Effect/Sharpen/Sharpen More
+Image/Shadow (c:Black; s:2; o:-30; x:1; y:1)
