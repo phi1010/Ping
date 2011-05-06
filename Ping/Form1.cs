@@ -7,16 +7,22 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Net.NetworkInformation;
+using System.Threading;
 
 namespace Ping
 {
 	public partial class Form1 : Form
 	{
+		const int Count = 10;
 		string URL;
+		const int PauseTime = 50;
+		const int ValueSuccess = 8;
+		const int ValueError = 1;
+		const int Timeout = 250;
+		Thread thread;
 
-		bool running = false;
-		bool? laststate = null;
-		//List<int> states = new List<int>();
+		bool running = true;
+		List<int> states = new List<int>();
 		public Form1()
 		{
 			InitializeComponent();
@@ -31,71 +37,76 @@ namespace Ping
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			textBox1.Text = URL;
-			UpdateIcon(null);
+			thread = new Thread(Run);
+			thread.Start();
 		}
 
-		public bool? CheckInternetConnection()
+		public int CheckInternetConnection()
 		{
 			System.Net.NetworkInformation.Ping ping = new System.Net.NetworkInformation.Ping();
 
 			try
 			{
-				PingReply reply = ping.Send(URL, 250);
-				return reply.Status == IPStatus.Success;
+				PingReply reply = ping.Send(URL, Timeout);
+				return reply.Status == IPStatus.Success ? ValueSuccess : 0;
 			}
-			catch
+			catch (Exception e)
 			{
-				return null;
-			}
-		}
-
-		private void timer1_Tick(object sender, EventArgs e)
-		{
-			if (running == false)
-			{
-				running = true;
-				bool? state = CheckInternetConnection();
-
-				UpdateIcon(state);
-				laststate = state;
-				running = false;
+				return ValueError;
 			}
 		}
 
-		private void UpdateIcon(bool? state)
+		private void Run()
 		{
-			Icon icon;
+			while (running)
+			{
+				states.Add(CheckInternetConnection());
+				if (states.Count > Count)
+					states.RemoveAt(0);
+				UpdateIcon();
+				Thread.Sleep(PauseTime);
+			}
+		}
 
-			if (laststate == null)
+		private void UpdateIcon()
+		{
+			Icon icon = null;
+			Icon icon0 = Properties.Resources._0;// X
+			Icon icon1 = Properties.Resources._1;// !
+			Icon icon2 = Properties.Resources._2;// ?
+			Icon icon3 = Properties.Resources._3;// i
+			Icon icon4 = Properties.Resources._4;// +
+			if (states.Count == 0)
 			{
-				if (state == null)
-					icon = Properties.Resources.x;
-				else if (state == true)
-					icon = Properties.Resources._1;
-				else//false
-					icon = Properties.Resources._0;
+				icon = icon2;
 			}
-			else if (laststate == true)
+			else
 			{
-				if (state == null)
-					icon = Properties.Resources._1;
-				else if (state == true)
-					icon = Properties.Resources._1;
-				else//false
-					icon = Properties.Resources._10;
-			}
-			else //false
-			{
-				if (state == null)
-					icon = Properties.Resources._0;
-				else if (state == true)
-					icon = Properties.Resources._10;
-				else//false
-					icon = Properties.Resources._0;
+				double percent = states.Sum() * 1d / (states.Count * ValueSuccess);
+				if (percent < 0.20)
+					icon = icon0;
+				else if (percent < 0.40)
+					icon = icon1;
+				else if (percent < 0.60)
+					icon = icon2;
+				else if (percent < 0.80)
+					icon = icon3;
+				else
+					icon = icon4;
 			}
 
 			//pictureBox1.BackgroundImage = icon.ToBitmap();
-			Icon = icon;
+			if (running)
+				try
+				{
+					Invoke(new Action(() => { Icon = icon; }));
+				}
+				catch { }
+		}
+
+		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			running = false;
 		}
 
 		private void textBox1_TextChanged(object sender, EventArgs e)
