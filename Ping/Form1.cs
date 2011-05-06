@@ -7,16 +7,21 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Net.NetworkInformation;
+using System.Threading;
 
 namespace Ping
 {
 	public partial class Form1 : Form
 	{
-		readonly int Count = 5;
-		readonly int PauseTime = 100;
+		const int Count = 10;
+		const int PauseTime = 50;
+		const int ValueSuccess = 8;
+		const int ValueError = 1;
+		const int Timeout = 250;
 		readonly string URL;
+		Thread thread;
 
-		bool running = false;
+		bool running = true;
 		List<int> states = new List<int>();
 		public Form1()
 		{
@@ -34,33 +39,34 @@ namespace Ping
 			Text = URL;
 			Width = TextRenderer.MeasureText(Text, Font).Width + 150;
 			MaximumSize = Size;
-			UpdateIcon();
+			thread = new Thread(Run);
+			thread.Start();
 		}
 
-		public bool? CheckInternetConnection()
+		public int CheckInternetConnection()
 		{
 			System.Net.NetworkInformation.Ping ping = new System.Net.NetworkInformation.Ping();
 
 			try
 			{
-				PingReply reply = ping.Send(URL, 250);
-				return reply.Status == IPStatus.Success;
+				PingReply reply = ping.Send(URL, Timeout);
+				return reply.Status == IPStatus.Success ? ValueSuccess : 0;
 			}
-			catch
+			catch (Exception e)
 			{
-				return null;
+				return ValueError;
 			}
 		}
 
-		private void timer1_Tick(object sender, EventArgs e)
+		private void Run()
 		{
-			if (running == false)
+			while (running)
 			{
-				running = true;
-				bool? state = CheckInternetConnection();
-
+				states.Add(CheckInternetConnection());
+				if (states.Count > Count)
+					states.RemoveAt(0);
 				UpdateIcon();
-				running = false;
+				Thread.Sleep(PauseTime);
 			}
 		}
 
@@ -72,11 +78,37 @@ namespace Ping
 			Icon icon2 = Properties.Resources._2;// ?
 			Icon icon3 = Properties.Resources._3;// i
 			Icon icon4 = Properties.Resources._4;// +
-
-
+			if (states.Count == 0)
+			{
+				icon = icon2;
+			}
+			else
+			{
+				double percent = states.Sum() * 1d / (states.Count * ValueSuccess);
+				if (percent < 0.20)
+					icon = icon0;
+				else if (percent < 0.40)
+					icon = icon1;
+				else if (percent < 0.60)
+					icon = icon2;
+				else if (percent < 0.80)
+					icon = icon3;
+				else
+					icon = icon4;
+			}
 
 			//pictureBox1.BackgroundImage = icon.ToBitmap();
-			Icon = icon;
+			if (running)
+				try
+				{
+					Invoke(new Action(() => { Icon = icon; }));
+				}
+				catch { }
+		}
+
+		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			running = false;
 		}
 	}
 }
